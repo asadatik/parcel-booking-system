@@ -14,33 +14,35 @@ const createDivision = async (payload: IDivision) => {
     return division
 };
 
-// const getAllDivisions = async (query: Record<string, string>) => {
+const getAllDivisions = async (query: Record<string, string>) => {
+    const { page = 1, limit = 10, ...filters } = query;
 
-//     const queryBuilder = new QueryBuilder(Division.find(), query)
+    const skip = (Number(page) - 1) * Number(limit);
+    const total = await Division.countDocuments(filters);
+    const divisions = await Division.find(filters)
+        .skip(skip)
+        .limit(Number(limit))
+        .sort({ createdAt: -1 });
 
-//     const divisionsData = queryBuilder
-//         .search(divisionSearchableFields)
-//         .filter()
-//         .sort()
-//         .fields()
-//         .paginate()
+    return {
+        data: divisions,
+        meta: {
+            page: Number(page),
+            limit: Number(limit),
+            total,
+            totalPages: Math.ceil(total / Number(limit)),
+        },
+    };
+};
 
-//     const [data, meta] = await Promise.all([
-//         divisionsData.build(),
-//         queryBuilder.getMeta()
-//     ])
 
-//     return {
-//         data,
-//         meta
-//     }
-// };
-// const getSingleDivision = async (slug: string) => {
-//     const division = await Division.findOne({ slug });
-//     return {
-//         data: division,
-//     }
-// };
+
+const getSingleDivision = async (slug: string) => {
+    const division = await Division.findOne({ slug });
+    return {
+        data: division,
+    }
+};
 
 
 
@@ -79,7 +81,8 @@ const deleteDivision = async (id: string) => {
 
 export const DivisionService = {
     createDivision,
-  
+     getAllDivisions,
     updateDivision,
     deleteDivision,
+    getSingleDivision
 };

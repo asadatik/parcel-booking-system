@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 ;
 import app from './app';
 import { envVars } from "./app/config/env";
-import { seedSuperAdmin } from "./app/utils/superAdmin";
+
 
 
 
@@ -26,13 +26,7 @@ const startServer = async () => {
     }
 }
 
-(async () => {
-    await startServer()
-   await seedSuperAdmin();
-    console.log("Super Admin seeded successfully!");
-    
-})()
-
+startServer();
 
 
 process.on("SIGTERM", () => {

@@ -23,4 +23,4 @@ router.patch(  "/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
 );
 router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.deleteDivision);
 
-export const DivisionRoutes = router
+export const DivisionRoutes = router  

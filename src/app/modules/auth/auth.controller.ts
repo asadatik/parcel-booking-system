@@ -136,29 +136,6 @@ const changePassword = catchAsync(async (req: Request, res: Response, next: Next
 
 
 
-// googleCallbackController
-const googleCallbackController = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  
-    let redirectTo = req.query.state ? req.query.state as string : ""
-    if (redirectTo.startsWith("/")) {
-        redirectTo = redirectTo.slice(1)
-    }
-
-
-    const user = req.user;
-
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "User Not Found")
-    }
-
-    const tokenInfo = createUserTokens(user)
-
-    setAuthCookie(res, tokenInfo)
-
-    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`)
-})
-
-
 
 
 export const AuthControllers = {
@@ -166,6 +143,6 @@ export const AuthControllers = {
     getNewAccestoken ,
     logOutUser,
     changePassword
-    , googleCallbackController
+
    
 }
