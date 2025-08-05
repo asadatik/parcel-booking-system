@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { isActive, IUser, role } from "./user.interface";
+import { isActive, IUser, Role } from "./user.interface";
 
 const userSchema = new Schema<IUser>(
   {
@@ -9,19 +9,11 @@ const userSchema = new Schema<IUser>(
     phone: { type: String, default: null },
     picture: { type: String, default: null },
     address: { type: String, default: null },
-    role: {
-      type: String,
-      enum: Object.values(role),
-      default: role.SENDER,
-      required: true,
-    },
+    role: {  type: String,  required: true, enum: Object.values(Role), },
     isDeleted: { type: Boolean, default: false },
-    isActive: {
-      type: String,
-      enum: Object.values(isActive),
-      default: isActive.ACTIVE,
+    isActive: {   type: String,  enum: Object.values(isActive), default: isActive.ACTIVE,
     },
-    isVarified: { type: Boolean, default: false },
+    isVerified: { type: Boolean, default: false },
     auth: [
       {
         provider: { type: String, required: true },

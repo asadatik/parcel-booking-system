@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
 
-export enum role{
+export enum Role{
     SENDER = "SENDER",
     ADMIN = "ADMIN",
-    RECIVER = "RECIVER",
+    RECEIVER = "RECEIVER",
 }
 
-export interface IAuth {
+export interface  IAuthProvider {
   provider: string;
   providerId: string;
 }
@@ -26,11 +26,11 @@ export interface IUser {
   phone?: string;
   picture?: string;
   address?: string;
-  role: role;
+  role: Role;
   isDeleted ?: boolean;
   isActive ?: isActive;
-  isVarified ?: boolean;
-  auth: IAuth[];
+  isVerified ?: boolean;
+  auth:  IAuthProvider[];
 
 }
 

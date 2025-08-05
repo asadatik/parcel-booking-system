@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { NextFunction, Request, Response } from "express";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

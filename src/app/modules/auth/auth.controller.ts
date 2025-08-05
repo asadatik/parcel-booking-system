@@ -10,50 +10,37 @@ import AppError from "../../errorHelper/appError"
 import { setAuthCookie } from "../../utils/setCookie"
 import { JwtPayload } from "jsonwebtoken"
 import { createUserTokens } from "../../utils/userTokens"
-import { envVars } from "../../config/env"
-import passport from "passport"
 
-// credentialsLogin by passport local strategy 
+// credentialsLogin
 
-const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate("local", async (err: any, user: any, info: any) => {
+const credentialsLogin = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const loginInfo = await AuthServices.credentialsLogin(req.body);
 
-        if (err) {
-               
-            return next(new AppError(401, err))
+    if (!loginInfo) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "Invalid credentials")
+    }
 
-        }
+    const userToken = createUserTokens(loginInfo);
 
-        if (!user) {
-          
-            return next(new AppError(401, info.message))
-        }
+    setAuthCookie(res, userToken);
 
-        const userTokens = await createUserTokens(user)
+ // Remove password from the user object before returning
 
+    const { password, ...rest } = loginInfo.toObject();
 
-        const { password: pass , ...rest } = user.toObject()
-
-
-        setAuthCookie(res, userTokens)
-
-        sendResponse(res, {
-            success: true,
-            statusCode: httpStatus.OK,
-            message: "User Logged In Successfully",
-            data: {
-                accessToken: userTokens.accessToken,
-                refreshToken: userTokens.refreshToken,
-                user: rest 
-
-            },
-        })
-    })(req, res, next)
-
-
-})
-
-
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+        message: "User Logged In Successfully",
+      data: {
+        accessToken: userToken.accessToken,
+        refreshToken: userToken.refreshToken,
+        user: rest,
+      },
+    });
+  },
+);
 
 
 //  gwtNewAccestoken      

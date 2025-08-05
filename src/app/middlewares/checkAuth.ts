@@ -1,45 +1,61 @@
-import { NextFunction, Request, Response } from "express";
-import { JwtPayload } from "jsonwebtoken";
-import { envVars } from "../config/env";
+import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status-codes';
+import { JwtPayload } from 'jsonwebtoken';
+import { envVars } from '../config/env';
 
-import { verifyToken } from "../utils/jwt";
-import { User } from "../modules/user/user.model";
-import httpStatus from "http-status-codes"
-import { IsActive } from "../modules/user/user.interface";
-import AppError from "../errorHelper/appError";
+import { User } from '../modules/user/user.model';
+import { verifyToken } from '../utils/jwt';
+import AppError from '../errorHelper/appError';
 
-export const checkAuth = (...authRoles : string[]) => async (req: Request, res: Response, next: NextFunction) => {
-
+export const checkAuth =
+  (...authRoles: string[]) =>
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const accessToken = req.headers.authorization;
+      const accessToken = req.headers.authorization;
 
-        if (!accessToken) {
-            throw new AppError(403, "No Token Recieved")
-        }
+      if (!accessToken) {
+        throw new AppError(401, 'Token not found');
+      }
+
+        // Token theke "Bearer" word ta remove kore access token ta niye ashtesi.
+      const verifiedToken = verifyToken(
+        accessToken,
+        envVars.JWT_ACCESS_SECRET,
+      ) as JwtPayload;
+
+      
+      // Jodi user na thake tahole error throw korbo.
+      const isUserExist = await User.findOne({
+        email: verifiedToken.email,
+      });
 
 
-        const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
+      if (!isUserExist) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'User not found');
+      }
 
-        // const isUserExist = await User.findOne({ email: verifiedToken.email })
+      // User er status check kortesi. 
+        if (
+            isUserExist.isActive === 'BLOCKED' ||
+            isUserExist.isActive === 'INACTIVE'  ) {   throw new AppError(  httpStatus.BAD_REQUEST,   `User is ${isUserExist.isActive}`,   )  }
 
-        // if (!isUserExist) {
-        //     throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
-        // }
-        // if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
-        //     throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
-        // }
-        // if (isUserExist.isDeleted) {
-        //     throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
-        // }
 
-        if (!authRoles.includes(verifiedToken.role)) {
-            throw new AppError(403, "You are not permitted to view this route!!!")
-        }
-        req.user = verifiedToken
-        next()
+       // User er isDeleted field check kortesi.     
 
+      if (isUserExist.isDeleted === true) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'User is Deleted');
+      }
+
+        // Jodi user er role authRoles array er moddhe na thake tahole error throw korbo.
+
+      if (!authRoles.includes(verifiedToken.role)) {
+        throw new AppError(403, 'You are not permitted to view this route!!');
+      }
+
+      req.user = verifiedToken;
+
+      next();
     } catch (error) {
-        console.log("jwt error", error);
-        next(error)
+      next(error);
     }
-}
+  };

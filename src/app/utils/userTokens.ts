@@ -1,7 +1,7 @@
 
 import { envVars } from "../config/env";
 import AppError from "../errorHelper/appError";
-import { IsActive, IUser } from "../modules/user/user.interface";
+import {  isActive, IUser } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
 
 
@@ -45,7 +45,7 @@ export const createNewAccessTokenWithRefreshToken = async (refreshToken: string)
     if (!isUserExist) {
         throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
     }
-    if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
+    if (isUserExist.isActive === isActive.BLOCKED || isUserExist.isActive === isActive.INACTIVE) {
         throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
     }
     if (isUserExist.isDeleted) {
