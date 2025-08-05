@@ -46,16 +46,17 @@ const createUser = async (payload: Partial<IUser>) => {
 // get all users
 
 const getAllUsers = async () => {
-    const users = await User.find({});
-    const totalUsers = await User.countDocuments();
+    const users = await User.find().select("-password");
+    const total = await User.countDocuments();
     return {
         data: users,
         meta: {
-            total: totalUsers
+            total,
+            page: 1, // Assuming pagination is not implemented yet
+            limit: total // Assuming no limit is set
         }
     }
-};
-
+}
 
 
 /////////  updated user ////
