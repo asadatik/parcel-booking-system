@@ -16,13 +16,6 @@ const prepareParcelResponse = (parcel: IParcel): IParcel => {
  
 //  generateTrackingId  
 
-// const generateTrackingId = (): string => {
-//   const date = new Date();
-//   const formattedDate = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
-//   const randomChars = Math.random().toString(36).substr(2, 6).toUpperCase();
-//   return `TRK-${formattedDate}-${randomChars}`;
-// };
-
 const generateTrackingId = (): string => {
   const date = new Date();
   const formattedDate = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;

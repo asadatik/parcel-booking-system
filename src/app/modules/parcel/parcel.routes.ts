@@ -10,7 +10,7 @@ import { checkAuth } from "../../middlewares/checkAuth";
 
 const router = Router();
 // Parcel routes
-router.post("/", checkAuth(Role.SENDER), validateRequest(createParcelZodSchema), ParcelControllers.createParcel);
+router.post("/create", checkAuth(Role.SENDER), validateRequest(createParcelZodSchema), ParcelControllers.createParcel);
 // Get all parcels
 router.get("/all", checkAuth(Role.ADMIN), ParcelControllers.getAllParcel);
 // Get single parcel by ID
