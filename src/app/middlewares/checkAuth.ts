@@ -11,14 +11,17 @@ export const checkAuth =
   (...authRoles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const accessToken = req.headers.authorization;
+      // const accessToken = req.headers.authorization;
+      const accessToken = req.headers.cookie;
+
+
 
       if (!accessToken) {
         throw new AppError(401, 'Token not found');
       }
 
-      
-// Token  verify
+  
+// Token 
 
       const verifiedToken = verifyToken(
         accessToken,
