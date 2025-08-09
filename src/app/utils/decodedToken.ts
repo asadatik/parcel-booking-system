@@ -3,12 +3,16 @@
 
 import  jwt, { JwtPayload }  from "jsonwebtoken";
 import AppError from "../errorHelper/appError";
+import { envVars } from "../config/env";
+
+
+
 
 
 
 export const decodedToken = (token: string): { userId: string; role: string; email: string } => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+    const decoded = jwt.verify(token,  envVars.JWT_ACCESS_SECRET as string) as JwtPayload;
     return {
       userId: decoded.id,
       role: decoded.role,
