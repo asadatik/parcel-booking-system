@@ -10,15 +10,17 @@ import { checkAuth } from "../../middlewares/checkAuth";
 
 const router = Router();
 // Parcel routes
-router.post("/create", checkAuth(Role.SENDER), validateRequest(createParcelZodSchema), ParcelControllers.createParcel);
+router.post("/create", checkAuth(Role.SENDER  , Role.ADMIN  ),validateRequest(createParcelZodSchema), ParcelControllers.createParcel);
 // Get all parcels
 router.get("/all", checkAuth(Role.ADMIN), ParcelControllers.getAllParcel);
-// Get single parcel by ID
-router.get("/:id", checkAuth(...Object.values(Role)), ParcelControllers.getSingleParcel);
 // Get parcels by sender
 router.get("/my", checkAuth(Role.SENDER), ParcelControllers.getMyParcels);
+
 // Get incoming parcels for receiver
 router.get("/incoming", checkAuth(Role.RECEIVER), ParcelControllers.getIncomingParcels);
+// Get single parcel by ID
+router.get("/:id", checkAuth(...Object.values(Role)), ParcelControllers.getSingleParcel);
+
 
 // Update parcel status
 router.patch("/:id/cancel", validateRequest(updateParcelStatusZodSchema), checkAuth(Role.SENDER), ParcelControllers.cancelParcel);

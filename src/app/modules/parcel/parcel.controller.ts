@@ -5,6 +5,7 @@ import { decodedToken } from "../../utils/decodedToken";
 import { ParcelServices } from "./parcel.service";
 import { sendResponse } from "../../utils/sendResponse";
 import AppError from "../../errorHelper/appError";
+import { log } from "console";
 
 
 // create parcel controller
@@ -48,6 +49,7 @@ const getAllParcel = catchAsync(async (req: Request, res: Response) => {
 // get single parcel controller
 const getSingleParcel = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
+  console.log(id) 
   const token = req.headers.authorization;
   if (!token) {
     throw new Error("Unauthorized: No token provided");
@@ -75,12 +77,13 @@ const getMyParcels = catchAsync(async (req: Request, res: Response) => {
     throw new Error("Unauthorized: No token provided");
   }
   const decode = decodedToken(token as string);
-
+    console.log('fffffffffffffffffffffff'  ,decode)
   if (!decode) {
     throw new Error("Unauthorized: Invalid token");
   }
   const senderId = decode.userId;
 
+  
   const result = await ParcelServices.getMyParcels(senderId);
 
   sendResponse(res, {
@@ -166,6 +169,7 @@ const getIncomingParcels = catchAsync(async (req: Request, res: Response) => {
   }
   const receiverId = decode.userId;
   const result = await ParcelServices.getIncomingParcels(receiverId);
+
 
   sendResponse(res, {
   statusCode: httpStatus.OK,
