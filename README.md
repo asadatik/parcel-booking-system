@@ -156,4 +156,4 @@ Server listens on the port specified in .env (default: 5000).
 
 ---
 
-###Thank you for checking out this project!
+Thank you for checking out this project!
