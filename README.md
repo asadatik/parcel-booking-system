@@ -75,5 +75,11 @@ src/
 git clone https://github.com/asadatik/parcel-booking-system
 cd parcel-booking-system
 
+```
+2. Install dependencies
+
+```bash
 npm install
 ```
+3.   Create .env file and add necessary environment variables (see .env.example)
+
