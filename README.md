@@ -46,10 +46,9 @@ This project implements a Parcel Management API to allow users (senders and rece
 
 src/
 ├── modules/
-│ ├── auth/ # Authentication module (login, signup)
+│ ├── auth/ # Authentication module 
 │ ├── user/ # User management (roles, profile)
-│ ├── parcel/ # Parcel features (controllers, models, services, validations)
-│ ├── otp/ # OTP verification (if applicable)
+│ ├── parcel/ # Parcel features (controllers, models, services, validations , routes)
 ├── middlewares/ # Auth, error handling, validation middlewares
 ├── config/ # Environment configs and constants
 ├── utils/ # Utility functions (JWT, error helper, response sender)
@@ -83,15 +82,16 @@ npm install
 ```
 3.   Create .env file and add necessary environment variables (see .env.example)
 
-
+---
 ##  📡 API Endpoints Overview
 
 | Method | Endpoint                  | Access Role             | Description                       |
 | ------ | ------------------------- | ----------------------- | --------------------------------- |
-| POST   | `/api/parcels`            | Sender                  | Create a new parcel               |
-| GET    | `/api/parcels/all`        | Admin                   | Get all parcels                   |
-| GET    | `/api/parcels/:id`        | Admin, Sender, Receiver | Get parcel by ID                  |
-| GET    | `/api/parcels/my`         | Sender                  | Get parcels created by sender     |
-| GET    | `/api/parcels/incoming`   | Receiver                | Get parcels destined for receiver |
-| PATCH  | `/api/parcels/:id/status` | Admin                   | Update parcel status              |
-| PATCH  | `/api/parcels/:id/cancel` | Sender                  | Cancel a parcel                   |
+| POST   | `/api/v1/parcel`            | Sender                  | Create a new parcel               |
+| GET    | `/api/v1/parcel/all`        | Admin                   | Get all parcels                   |
+| GET    | `/api/v1/parcels/:id`        | Admin, Sender, Receiver | Get parcel by ID                  |
+| GET    | `/api/v1/parcels/my`         | Sender                  | Get parcels created by sender     |
+| GET    | `/api/v1/parcels/incoming`   | Receiver                | Get parcels destined for receiver |
+| PATCH  | `/api/v1/parcels/:id/status` | Admin                   | Update parcel status              |
+| PATCH  | `/api/v1/parcels/:id/cancel` | Sender                  | Cancel a parcel                   |
+---
