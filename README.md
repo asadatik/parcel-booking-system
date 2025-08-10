@@ -83,3 +83,15 @@ npm install
 ```
 3.   Create .env file and add necessary environment variables (see .env.example)
 
+
+##  📡 API Endpoints Overview
+
+| Method | Endpoint                  | Access Role             | Description                       |
+| ------ | ------------------------- | ----------------------- | --------------------------------- |
+| POST   | `/api/parcels`            | Sender                  | Create a new parcel               |
+| GET    | `/api/parcels/all`        | Admin                   | Get all parcels                   |
+| GET    | `/api/parcels/:id`        | Admin, Sender, Receiver | Get parcel by ID                  |
+| GET    | `/api/parcels/my`         | Sender                  | Get parcels created by sender     |
+| GET    | `/api/parcels/incoming`   | Receiver                | Get parcels destined for receiver |
+| PATCH  | `/api/parcels/:id/status` | Admin                   | Update parcel status              |
+| PATCH  | `/api/parcels/:id/cancel` | Sender                  | Cancel a parcel                   |
