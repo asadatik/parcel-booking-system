@@ -18,12 +18,14 @@ router.get("/my", checkAuth(Role.SENDER), ParcelControllers.getMyParcels);
 
 // Get incoming parcels for receiver
 router.get("/incoming", checkAuth(Role.RECEIVER), ParcelControllers.getIncomingParcels);
+
 // Get single parcel by ID
 router.get("/:id", checkAuth(...Object.values(Role)), ParcelControllers.getSingleParcel);
 
 
 // Update parcel status
 router.patch("/:id/cancel", validateRequest(updateParcelStatusZodSchema), checkAuth(Role.SENDER), ParcelControllers.cancelParcel);
+
 // Update parcel status by admin
 router.patch("/:id/status", checkAuth(Role.ADMIN), ParcelControllers.updateParcelStatus);
 

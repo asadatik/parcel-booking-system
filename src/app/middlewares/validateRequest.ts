@@ -1,15 +1,20 @@
+
+/* eslint-disable no-console */
 import { NextFunction, Request, Response } from "express"
-import { AnyZodObject } from "zod"
+import { ZodObject, ZodRawShape } from "zod"
 
-export const validateRequest = (zodSchema: AnyZodObject) => async (req: Request, res: Response, next: NextFunction) => {
+export const validateRequest =
+  (zodSchema: ZodObject<ZodRawShape>) =>
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log("🚀 ~ file: validateRequest.ts ~ line 6 ~ validateRequest ~ req.body", req.body)
-        req.body = await zodSchema.parseAsync(req.body)
-        
-        console.log("🚀 ~ file: validateRequest.ts ~ line 9 ~ validateRequest ~ req.body", req.body)
+      console.log("🚀 ~ validateRequest ~ incoming body:", req.body)
+      
+      req.body = await zodSchema.parseAsync(req.body)
 
-        next()
+      console.log("🚀 ~ validateRequest ~ parsed body:", req.body)
+
+      next()
     } catch (error) {
-        next(error)
+      next(error)
     }
-}
+  }

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
@@ -5,7 +6,7 @@ import { decodedToken } from "../../utils/decodedToken";
 import { ParcelServices } from "./parcel.service";
 import { sendResponse } from "../../utils/sendResponse";
 import AppError from "../../errorHelper/appError";
-import { log } from "console";
+
 
 
 // create parcel controller
