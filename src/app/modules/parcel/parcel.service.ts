@@ -7,7 +7,6 @@ import AppError from "../../errorHelper/appError";
 import { Role } from "../user/user.interface";
 import crypto from "crypto";
 
-
 const prepareParcelResponse = (parcel: IParcel): IParcel => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { ...rest } = (parcel as any).toJSON();
@@ -22,7 +21,6 @@ const generateTrackingId = (): string => {
   const randomBytes = crypto.randomBytes(3).toString("hex").toUpperCase(); // 6 chars
   return `TRK-${formattedDate}-${randomBytes}`;
 };
-
 
 //createdParcel 
 const createParcel = async (
@@ -147,7 +145,6 @@ const updateParcelStatus = async (
   if (!parcel) {
     throw new AppError(  httpStatus.NOT_FOUND , "Parcel not found",  );
   }
-
   const currentStatus = parcel.currentStatus;
   const newStatus = payload.status;
   if (
@@ -159,7 +156,7 @@ const updateParcelStatus = async (
   ) {
     throw new AppError(  httpStatus.BAD_REQUEST , 'Cannot change status from currentStatus to newStatus'  );
   }
-
+                         
   if (parcel.isCancelled || parcel.isDelivered) {
     throw new AppError(httpStatus.BAD_REQUEST ,  "Cannot update a cancelled or delivered parcel."   );
   }
