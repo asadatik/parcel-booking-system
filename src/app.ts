@@ -14,7 +14,14 @@ const app  = express();
 
 app.set('trust proxy', 1);
 app.use(cookieParser());
-app.use(cors())
+
+
+app.use(cors({
+  origin: "http://localhost:5173", // frontend URL
+  credentials: true,              // allow cookies/headers
+}));
+
+
 app.use(express.json())
 
 

@@ -7,16 +7,17 @@ import { OTPService } from "./otp.service";
 
 const sendOTP = catchAsync(async (req: Request, res: Response) => {
     const { email, name } = req.body
-    console.log(email   , name ,'FCUK'   )  
+    console.log(email   , name ,'FCUK........ otp.controller'      )  
     await OTPService.sendOTP(email, name)
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "OTP sent successfully",
         data: null,
+
     });
 })
-
+   
 const verifyOTP = catchAsync(async (req: Request, res: Response) => {
     const { email, otp } = req.body;
     await OTPService.verifyOTP(email, otp)

@@ -2,8 +2,9 @@ import crypto from "crypto";
 
 import { User } from "../user/user.model";
 import AppError from "../../errorHelper/appError";
-import { sendEmail } from "../../utils/sendEmail";
+
 import { redisClient } from "../../config/redis.config";
+import { sendEmail } from "../../utils/sendEmail";
 const OTP_EXPIRATION = 2 * 60 // 2minute
 
 const generateOtp = (length = 6) => {
@@ -26,6 +27,8 @@ const sendOTP = async (email: string, name: string) => {
 
     if (user.isVerified) {
         throw new AppError(401, "You are already verified")
+        
+
     }
     const otp = generateOtp();
 
