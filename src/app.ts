@@ -7,20 +7,28 @@ import { globalErrorHandler } from "./app/middlewares/globalerrorhandler";
 import notFound from "./app/middlewares/notfoundroute";
 import cookieParser from "cookie-parser";
 
+import expressSession from "express-session";
+
 
 const app  = express();
 
+app.use(expressSession(
+    {
+        secret: "secret",
+        resave: false,
+        saveUninitialized: true, }
+
+))
 
 
-app.set('trust proxy', 1);
 app.use(cookieParser());
 
+//
 
-app.use(cors({
-  origin: "http://localhost:5173", // frontend URL
-  credentials: true,              // allow cookies/headers
-}));
-
+app.use( cors({
+    origin: "http://localhost:5173", // frontend url explicitly দিতে হবে
+    credentials: true, // cookie/auth header পাঠানোর জন্য
+  })   )
 
 app.use(express.json())
 
@@ -40,4 +48,3 @@ app.use(globalErrorHandler)
 app.use(notFound)
 
 export default app;
-

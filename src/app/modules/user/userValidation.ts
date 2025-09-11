@@ -17,18 +17,12 @@ export const createUserZodSchema = z.object({
         .regex(/^(?=.*[A-Z])/, {
             message: "Password must contain at least 1 uppercase letter.",
         })
-        // .regex(/^(?=.*[!@#$%^&*])/, {
-        //     message: "Password must contain at least 1 special character.",
-        // })
-        // .regex(/^(?=.*\d)/, {
-        //     message: "Password must contain at least 1 number.",
-        // }) 
-        ,
-    
-          role: z
-        .enum(Object.values(Role) as [string])
-        .optional(),
-
+        .regex(/^(?=.*[!@#$%^&*])/, {
+            message: "Password must contain at least 1 special character.",
+        })
+        .regex(/^(?=.*\d)/, {
+            message: "Password must contain at least 1 number.",
+        }),
     phone: z
         .string({ error: "Phone Number must be string" })
         .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
@@ -67,6 +61,7 @@ export const updateUserZodSchema = z.object({
         })
         .optional(),
     role: z
+
         .enum(Object.values(Role) as [string])
         .optional(),
     isActive: z

@@ -1,15 +1,12 @@
 
 import { JwtPayload } from "jsonwebtoken";
-import {  IAuthProvider, IUser, Role } from "./user.interface";
+import { IAuthProvider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs"
 import AppError from "../../errorHelper/appError";
 
-
 // create a new user
-
-
 const createUser = async (payload: Partial<IUser>) => {
     const { email, password , ...rest} = payload;
 
@@ -22,13 +19,20 @@ const createUser = async (payload: Partial<IUser>) => {
         throw new Error("User already exists with this email");
     }
 
+
     const hashedPassword = await bcryptjs.hash(password as string, 10)
+
+
+
+
 
 
         const authProvider : IAuthProvider = {
         provider: "credentials",
         providerId: email as string,
         }
+
+
 
     
     const user = await User.create({
@@ -38,12 +42,14 @@ const createUser = async (payload: Partial<IUser>) => {
        ...rest
     })
 
-    return   user ;
-    
+    return   user
 
 }
 
+
+
 // get all users
+
 
 const getAllUsers = async () => {
     const users = await User.find().select("-password");
@@ -58,8 +64,8 @@ const getAllUsers = async () => {
     }
 }
 
+// update user
 
-/////////  updated user ////
 const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
 
     const ifUserExist = await User.findById(userId);
@@ -109,7 +115,7 @@ if (payload.role) {
     return newUpdatedUser
 }
 
-// get single user
+//
 
 const getSingleUser = async (id: string) => {
     const user = await User.findById(id).select("-password");
@@ -119,7 +125,7 @@ const getSingleUser = async (id: string) => {
 };
 
 
-// get me
+//
 const getMe = async (userId: string) => {
     const user = await User.findById(userId).select("-password");
     return {
@@ -128,11 +134,12 @@ const getMe = async (userId: string) => {
 };
 
 
-
 export const UserServices = {
+
+
     createUser,
     getAllUsers ,
-    updateUser,
+    updateUser ,
     getSingleUser ,
     getMe
     

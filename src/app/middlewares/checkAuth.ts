@@ -10,8 +10,9 @@ import AppError from "../errorHelper/appError";
 import { User } from "../modules/user/user.model";
 import { isActive } from "../modules/user/user.interface";
 
-export const checkAuth = (...authRoles : string[]) => async (req: Request, res: Response, next: NextFunction) => {
 
+export const checkAuth = (...authRoles : string[]) => async (req: Request, res: Response, next: NextFunction) => {
+         console.log("authRoles from checkAuth", authRoles);
     try {
         const accessToken = req.headers.authorization || req.cookies.accessToken
         // const accessToken = req.headers.authorization 
@@ -23,9 +24,15 @@ export const checkAuth = (...authRoles : string[]) => async (req: Request, res: 
 
 
         const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
+              
+           console.log("verifiedToken from checkAuth", verifiedToken);
+
 
         const isUserExist = await User.findOne({ email: verifiedToken.email })
 
+
+
+              
         if (!isUserExist) {
             throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
         }
@@ -39,9 +46,12 @@ export const checkAuth = (...authRoles : string[]) => async (req: Request, res: 
         if (!authRoles.includes(verifiedToken.role)) {
             throw new AppError(403, "You are not permitted to view this route!!!")
         }
-        req.user = verifiedToken
+        req.user = verifiedToken 
+        
         next()
 
+          console.log("after next in checkAuth");
+          console.log("req.user from checkAuth", req.user);
     } catch (error) {
         console.log("jwt error", error);
         next(error)
