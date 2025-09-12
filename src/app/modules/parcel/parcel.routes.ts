@@ -14,7 +14,7 @@ router.post("/create", checkAuth(Role.SENDER  , Role.ADMIN  ),validateRequest(cr
 // Get all parcels
 router.get("/all", checkAuth(Role.ADMIN), ParcelControllers.getAllParcel);
 // Get parcels by sender
-router.get("/my", checkAuth(Role.SENDER), ParcelControllers.getMyParcels);
+router.get("/my", checkAuth(Role.SENDER , Role.ADMIN  ), ParcelControllers.getMyParcels);
 
 // Get incoming parcels for receiver
 router.get("/incoming", checkAuth(Role.RECEIVER), ParcelControllers.getIncomingParcels);

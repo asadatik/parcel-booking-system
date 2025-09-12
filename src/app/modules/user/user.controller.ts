@@ -49,21 +49,53 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-//
+
+
+// get All Sender
+const getAllSender = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = await UserServices.getAllSender(
+      req.query as Record<string, string>,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Sender retrieved Successfully',
+      data,
+    });
+  },
+);
+
+// get All  Receiver
+const getAllReceiver = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = await UserServices.getAllReciver(
+      req.query as Record<string, string>,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Receiver retrieved Successfully',
+      data,
+    });
+  },
+);
+
+
+
+// update user
 const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
-    // const token = req.headers.authorization
-    // const verifiedToken = verifyToken(token as string, envVars.JWT_ACCESS_SECRET) as JwtPayload
+
 
     const verifiedToken = req.user;
 
     const payload = req.body;
     const user = await UserServices.updateUser(userId, payload, verifiedToken as JwtPayload)
 
-    // res.status(httpStatus.CREATED).json({
-    //     message: "User Created Successfully",
-    //     user
-    // })
+
 
     sendResponse(res, {
         success: true,
@@ -73,7 +105,7 @@ const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 })
 
-
+// get own profile
 const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user as JwtPayload
     const result = await UserServices.getMe(decodedToken.userId);
@@ -82,11 +114,7 @@ const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction)
         "🚀 ~ file: user.controller.ts ~ line 94 ~ getMe ~ result",
         result
       )
-    // res.status(httpStatus.OK).json({
-    //     success: true,
-    //     message: "All Users Retrieved Successfully",
-    //     data: users
-    // })
+   
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
@@ -94,6 +122,9 @@ const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction)
         data: result.data
     })
 })
+
+
+// getSingleUser 
 const getSingleUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const result = await UserServices.getSingleUser(id);
@@ -106,12 +137,16 @@ const getSingleUser = catchAsync(async (req: Request, res: Response, next: NextF
 })
 
 
+
 export const UserControllers = {
   createUser,
   getAllUsers,
   getMe,
   getSingleUser,
-  updateUser
+  updateUser , 
+  getAllReceiver, 
+  getAllSender
+
 
 
 

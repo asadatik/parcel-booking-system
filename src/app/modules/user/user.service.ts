@@ -51,18 +51,58 @@ const createUser = async (payload: Partial<IUser>) => {
 // get all users
 
 
-const getAllUsers = async () => {
-    const users = await User.find().select("-password");
-    const total = await User.countDocuments();
-    return {
-        data: users,
-        meta: {
-            total,
-            page: 1, // Assuming pagination is not implemented yet
-            limit: total // Assuming no limit is set
-        }
+const getAllUsers = async (page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+  const users = await User.find().select("-password").skip(skip).limit(limit);
+  const total = await User.countDocuments();
+
+  return {
+    data: users,
+    meta: {
+      total,
+      page,
+      limit
     }
-}
+  };
+};
+
+
+//
+
+const getAllSender = async (filters: Record<string, string>, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+  const senders = await User.find({ role: Role.SENDER, ...filters })
+    .select("-password")
+    .skip(skip)
+    .limit(limit);
+  const total = await User.countDocuments({ role: Role.SENDER, ...filters });
+
+  return {
+    data: senders,
+    meta: { total, page, limit }
+  };
+};
+
+
+//
+
+const getAllReceiver = async (filters: Record<string, string>, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+  const receivers = await User.find({ role: Role.RECEIVER, ...filters })
+    .select("-password")
+    .skip(skip)
+    .limit(limit);
+  const total = await User.countDocuments({ role: Role.RECEIVER, ...filters });
+
+  return {
+    data: receivers,
+    meta: { total, page, limit }
+  };
+};
+
+
+
+
 
 // update user
 
@@ -79,6 +119,8 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
 
 
     // Check if the user is trying to update their own profile or an admin is updating another user
+   
+   
     if (ifUserExist.email !== decodedToken.email && decodedToken.role !== Role.ADMIN) {
         throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized to update this user")
     }
@@ -99,9 +141,6 @@ if (payload.role) {
         throw new AppError(httpStatus.BAD_REQUEST, "Invalid role provided");
     }
 }
-
-
-
 
     // If password is being updated, hash it
     if (payload.password) {
@@ -141,6 +180,8 @@ export const UserServices = {
     getAllUsers ,
     updateUser ,
     getSingleUser ,
-    getMe
+    getMe ,
+    getAllReceiver ,
+    getAllSender
     
 }
