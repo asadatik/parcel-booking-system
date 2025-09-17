@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express"
@@ -109,6 +110,9 @@ const changePassword = catchAsync(async (req: Request, res: Response, next: Next
     const newPassword = req.body.newPassword;
     const oldPassword = req.body.oldPassword;
     const decodedToken = req.user
+        console.log(decodedToken ,'controller' )
+        console.log(oldPassword, newPassword)
+
 
     await AuthServices.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload);
 

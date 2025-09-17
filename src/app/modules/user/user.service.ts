@@ -5,6 +5,8 @@ import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs"
 import AppError from "../../errorHelper/appError";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import { userSearchableFields } from "./user.constant";
 
 // create a new user
 const createUser = async (payload: Partial<IUser>) => {
@@ -50,21 +52,25 @@ const createUser = async (payload: Partial<IUser>) => {
 
 // get all users
 
+const getAllUsers = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(User.find(), query);
+  const users = await queryBuilder
+    .search(userSearchableFields)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
 
-const getAllUsers = async (page = 1, limit = 10) => {
-  const skip = (page - 1) * limit;
-  const users = await User.find().select("-password").skip(skip).limit(limit);
-  const total = await User.countDocuments();
-
+  const [data, meta] = await Promise.all([
+    users.build(),
+    queryBuilder.getMeta(),
+  ]);
   return {
-    data: users,
-    meta: {
-      total,
-      page,
-      limit
-    }
+    meta,
+    data,
   };
 };
+
 
 
 //

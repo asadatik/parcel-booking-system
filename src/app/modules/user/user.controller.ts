@@ -70,7 +70,7 @@ const getAllSender = catchAsync(
 // get All  Receiver
 const getAllReceiver = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = await UserServices.getAllReciver(
+    const data = await UserServices.getAllReceiver(
       req.query as Record<string, string>,
     );
 
