@@ -22,6 +22,8 @@ export interface ICreateParcelPayload {
   parcelType: string;
   weight: number;
   deliveryAddress: string;
+  parcelFee: number;
+  DeliveryDate: Date;
 }
 
 export interface IUpdateParcelPayload {
@@ -55,14 +57,14 @@ export interface IParcel {
   weight: number; 
   deliveryAddress: string;
   currentStatus: IParcelStatus;
-  parcelFee?: number; 
-  estimatedDeliveryDate?: Date; 
+  parcelFee: number; 
+  DeliveryDate: Date; 
   isCancelled: boolean;
   isDelivered: boolean;
-  isBlocked?: boolean; 
+  isBlocked: boolean; 
   statusLogs: IStatusLog[]; 
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 

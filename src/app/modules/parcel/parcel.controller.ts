@@ -11,7 +11,13 @@ import AppError from "../../errorHelper/appError";
 
 // create parcel controller
 const createParcel = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
+
+
+
+ const token = req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : req.cookies.accessToken;
+  
 if (!token) {
   throw new AppError(httpStatus.UNAUTHORIZED, "No token provided");
 }
@@ -51,7 +57,12 @@ const getAllParcel = catchAsync(async (req: Request, res: Response) => {
 const getSingleParcel = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   console.log(id) 
-  const token = req.headers.authorization;
+
+   const token = req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : req.cookies.accessToken;
+
+
   if (!token) {
     throw new Error("Unauthorized: No token provided");
   }
@@ -73,7 +84,11 @@ const getSingleParcel = catchAsync(async (req: Request, res: Response) => {
 
 // get my parcels controller
 const getMyParcels = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
+   const token = req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : req.cookies.accessToken;
+
+
   if (!token) {
     throw new Error("Unauthorized: No token provided");
   }
@@ -100,7 +115,9 @@ const getMyParcels = catchAsync(async (req: Request, res: Response) => {
 
 const updateParcelStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const token = req.headers.authorization;
+ const token = req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : req.cookies.accessToken;
   if (!token) {
     throw new Error("Unauthorized: No token provided");
   }
@@ -130,7 +147,9 @@ const updateParcelStatus = catchAsync(async (req: Request, res: Response) => {
 
 const cancelParcel = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const token = req.headers.authorization;
+ const token = req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : req.cookies.accessToken;
   if (!token) {
   throw new AppError(  httpStatus.NOT_FOUND  , "Parcel not found" );
   }
@@ -159,7 +178,9 @@ const cancelParcel = catchAsync(async (req: Request, res: Response) => {
 // get incoming parcels controller
 
 const getIncomingParcels = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
+  const token = req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : req.cookies.accessToken;
   if (!token) {
     throw new Error("Unauthorized: No token provided");
   }

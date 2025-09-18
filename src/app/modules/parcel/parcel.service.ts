@@ -22,27 +22,24 @@ const generateTrackingId = (): string => {
   return `TRK-${formattedDate}-${randomBytes}`;
 };
 
-//createdParcel 
+
+
+// create 
+
+
 const createParcel = async (
   payload: ICreateParcelPayload,
   senderId: string,
 ): Promise<IParcel> => {
 
-  // Ensure receiver.userId is a valid ObjectId if provided
   let receiverUserId: Types.ObjectId | undefined;
   if (payload.receiver.userId && Types.ObjectId.isValid(payload.receiver.userId)) {
     receiverUserId = new Types.ObjectId(payload.receiver.userId);
   }
 
-
+  const now = new Date();
 
   const newParcelData: IParcel = {
-    // Other data
-    parcelType: payload.parcelType,
-    weight: payload.weight,
-    deliveryAddress: payload.deliveryAddress,
-    
-    // basic data
     trackingId: generateTrackingId(),
     sender: new Types.ObjectId(senderId),
     receiver: {
@@ -51,17 +48,25 @@ const createParcel = async (
       address: payload.receiver.address,
       userId: receiverUserId,
     },
+    parcelType: payload.parcelType,
+    weight: payload.weight,
+    deliveryAddress: payload.deliveryAddress,
+    parcelFee: payload.parcelFee,             // ✅ required
+    DeliveryDate: payload.DeliveryDate || now, // ✅ required
     currentStatus: IParcelStatus.Requested,
     isCancelled: false,
     isDelivered: false,
+    isBlocked: false,                        // ✅ required
     statusLogs: [
       {
         status: IParcelStatus.Requested,
-        timestamp: new Date(),
+        timestamp: now,
         updatedBy: new Types.ObjectId(senderId),
         note: "Parcel delivery request created by sender",
       },
     ],
+    createdAt: now,                           // ✅ required
+    updatedAt: now,                           // ✅ required
   };
 
   const newParcel = await Parcel.create(newParcelData);

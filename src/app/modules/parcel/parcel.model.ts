@@ -55,6 +55,7 @@ const parcelSchema = new Schema<IParcel>(
     weight: {
       type: Number,
       required: true,
+
     },
     deliveryAddress: {
       type: String,
@@ -69,9 +70,11 @@ const parcelSchema = new Schema<IParcel>(
     },
     parcelFee: {
       type: Number,
+    required: true,
     },
-    estimatedDeliveryDate: {
+    DeliveryDate: {
       type: Date,
+        required: true,
     },
     isCancelled: {
       type: Boolean,

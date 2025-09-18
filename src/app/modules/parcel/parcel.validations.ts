@@ -28,6 +28,8 @@ export const createParcelZodSchema = z.object({
     .string()
     .min(1, "Please provide a delivery address")
     .max(200, "Limit your delivery address to 200 characters"),
+  parcelFee: z.number().positive("need positive number"),
+  DeliveryDate: z.coerce.date().min(new Date(), "Delivery date must be in the future"),
 });
 export const updateParcelStatusZodSchema = z.object({
   status: z.enum([...Object.values(IParcelStatus)] as [string, ...string[]]),
