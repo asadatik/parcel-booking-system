@@ -14,7 +14,6 @@ import { JwtPayload } from "jsonwebtoken";
 const createUser = async (req: Request, res: Response  , next : NextFunction) => {
   try {
    
-   
     const user = await UserServices.createUser(req.body)
 
     res.status(httpStatus.CREATED).json({
@@ -22,9 +21,6 @@ const createUser = async (req: Request, res: Response  , next : NextFunction) =>
       user
     })
   }
-   
-
-
   
  catch (err: any) {
      console.log(
