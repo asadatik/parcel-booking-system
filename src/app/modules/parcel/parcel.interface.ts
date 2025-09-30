@@ -13,12 +13,7 @@ export enum IParcelStatus {
 }
 
 export interface ICreateParcelPayload {
-  receiver: {
-    name: string;
-    phone: string;
-    address: string;
-    userId?: string; 
-  };
+  receiver: string; // ✅ email from frontend
   parcelType: string;
   weight: number;
   deliveryAddress: string;
@@ -47,12 +42,7 @@ export interface IParcel {
   _id?: Types.ObjectId;
   trackingId: string;
   sender: Types.ObjectId; 
-  receiver: {
-    name: string;
-    phone: string;
-    address: string;
-    userId?: Types.ObjectId;
-  };
+receiver: string | Types.ObjectId;
   parcelType: string; 
   weight: number; 
   deliveryAddress: string;

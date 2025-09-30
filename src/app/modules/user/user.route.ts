@@ -18,7 +18,7 @@ router.get("/me", checkAuth(...Object.values(Role)), UserControllers.getMe)
 //
 router.get(  '/senders', checkAuth( Role.ADMIN ) ,   UserControllers.getAllSender,);
 //
-router.get('/receivers' , checkAuth( Role.ADMIN ) , UserControllers.getAllReceiver,
+router.get('/receivers' , checkAuth( Role.ADMIN , Role.SENDER ) , UserControllers.getAllReceiver,
 );
 
 

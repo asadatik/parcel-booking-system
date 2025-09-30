@@ -6,6 +6,7 @@ import { Parcel } from "./parcel.model";
 import AppError from "../../errorHelper/appError";
 import { Role } from "../user/user.interface";
 import crypto from "crypto";
+import { User } from "../user/user.model";
 
 const prepareParcelResponse = (parcel: IParcel): IParcel => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,32 +32,26 @@ const createParcel = async (
   payload: ICreateParcelPayload,
   senderId: string,
 ): Promise<IParcel> => {
-
-  let receiverUserId: Types.ObjectId | undefined;
-  if (payload.receiver.userId && Types.ObjectId.isValid(payload.receiver.userId)) {
-    receiverUserId = new Types.ObjectId(payload.receiver.userId);
-  }
-
   const now = new Date();
+
+
 
   const newParcelData: IParcel = {
     trackingId: generateTrackingId(),
     sender: new Types.ObjectId(senderId),
-    receiver: {
-      name: payload.receiver.name,
-      phone: payload.receiver.phone,
-      address: payload.receiver.address,
-      userId: receiverUserId,
-    },
+
+    // ✅ সরাসরি email string save করবো
+    receiver: payload.receiver,
+
     parcelType: payload.parcelType,
     weight: payload.weight,
     deliveryAddress: payload.deliveryAddress,
-    parcelFee: payload.parcelFee,             // ✅ required
-    DeliveryDate: payload.DeliveryDate || now, // ✅ required
+    parcelFee: payload.parcelFee,
+    DeliveryDate: payload.DeliveryDate || now,
     currentStatus: IParcelStatus.Requested,
     isCancelled: false,
     isDelivered: false,
-    isBlocked: false,                        // ✅ required
+    isBlocked: false,
     statusLogs: [
       {
         status: IParcelStatus.Requested,
@@ -65,8 +60,8 @@ const createParcel = async (
         note: "Parcel delivery request created by sender",
       },
     ],
-    createdAt: now,                           // ✅ required
-    updatedAt: now,                           // ✅ required
+    createdAt: now,
+    updatedAt: now,
   };
 
   const newParcel = await Parcel.create(newParcelData);
@@ -90,7 +85,7 @@ const getSingleParcel = async (parcelId: string, user: JwtPayload): Promise<IPar
   }
 
 
-  if (user.role === Role.ADMIN || parcel.sender.toString() === user.userId || parcel.receiver.userId?.toString() === user.userId) {
+  if (user.role === Role.ADMIN || parcel.sender.toString() === user.userId || parcel.receiver === user.email) {
     return prepareParcelResponse(parcel as IParcel);
   }
 
