@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
 import { decodedToken } from "../../utils/decodedToken";
 import { ParcelServices } from "./parcel.service";
 import { sendResponse } from "../../utils/sendResponse";
 import AppError from "../../errorHelper/appError";
+import { JwtPayload } from "jsonwebtoken";
+import { compile } from "ejs";
 
 
 
@@ -23,13 +26,14 @@ if (!token) {
 }
 
   const decode = decodedToken(token as string);
+   console.log("Decoded token in createParcel controller:", decode);
 
 if (!decode) {
   throw new AppError(httpStatus.UNAUTHORIZED, "Invalid credentials");
 }
 
   const senderId = decode.userId;
-
+  console.log("Sender ID from createParcel controller:", senderId);
   const result = await ParcelServices.createParcel(req.body, senderId);
 
   sendResponse(res, {
@@ -82,33 +86,36 @@ const getSingleParcel = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// get my parcels controller
-const getMyParcels = catchAsync(async (req: Request, res: Response) => {
-   const token = req.headers.authorization?.startsWith("Bearer ")
-        ? req.headers.authorization.split(" ")[1]
-        : req.cookies.accessToken;
 
 
-  if (!token) {
-    throw new Error("Unauthorized: No token provided");
+export const getMyParcels = async (req: Request, res  : Response) => {
+  try {
+    const userId = req.user._id; // ধরলাম req.user এ auth middleware থেকে আসছে
+
+       console.log("User ID from parcel controller    :", userId);
+    const parcels = await ParcelServices.getMyParcels(userId);
+
+    if (!parcels || parcels.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No parcels found for this user",
+      });
+    }
+      console.log("Parcels in controller:", parcels);
+    res.status(200).json({
+      success: true,
+      message: "Parcels fetched successfully",
+      data: parcels,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch parcels",
+      error: error.message,
+    });
   }
-  const decode = decodedToken(token as string);
-    console.log('fffffffffffffffffffffff'  ,decode)
-  if (!decode) {
-    throw new Error("Unauthorized: Invalid token");
-  }
-  const senderId = decode.userId;
+};
 
-  
-  const result = await ParcelServices.getMyParcels(senderId);
-
-  sendResponse(res, {
-  statusCode: httpStatus.OK,
-    success: true,
-    message: "Sender's parcels retrieved successfully",
-    data: result,
-  });
-});
 
 
 // update parcel status controller
@@ -143,37 +150,30 @@ const updateParcelStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// cancel parcel controller
 
+// cancel parcel controller
 const cancelParcel = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
- const token = req.headers.authorization?.startsWith("Bearer ")
-        ? req.headers.authorization.split(" ")[1]
-        : req.cookies.accessToken;
-  if (!token) {
-  throw new AppError(  httpStatus.NOT_FOUND  , "Parcel not found" );
-  }
-
-   
-
+  const decoded = req.user; // ✅ আসছে checkAuth থেকে
 
   
-  const decode = decodedToken(token as string);
-
-  if (!decode) {
-    throw new Error("Unauthorized: Invalid token");
+   console.log("Decoded user from cancelParcel controller:", decoded);
+  if (!decoded) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized request");
   }
-  const senderId = decode.userId;
+
+  const senderId = (decoded as JwtPayload).userId;
 
   const result = await ParcelServices.cancelParcel(id, senderId);
 
   sendResponse(res, {
-  statusCode: httpStatus.OK,
+    statusCode: httpStatus.OK,
     success: true,
     message: "Parcel was cancelled by sender",
     data: result,
   });
 });
+
 
 // get incoming parcels controller
 

@@ -20,7 +20,10 @@ export const checkAuth = (...authRoles: string[]) =>
         ? req.headers.authorization.split(" ")[1]
         : req.cookies.accessToken;
 
-// const accessToken = req.headers.authorization || req.cookies.accessToken 
+
+
+console.log("Token received:", accessToken);
+
 
       if (!accessToken) {
         throw new AppError(403, "No Token Received");

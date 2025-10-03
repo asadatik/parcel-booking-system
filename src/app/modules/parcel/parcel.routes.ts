@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { Role } from "../user/user.interface";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { createParcelZodSchema, updateParcelStatusZodSchema } from "./parcel.validations";
+import { createParcelZodSchema, } from "./parcel.validations";
 import { ParcelControllers } from "./parcel.controller";
 import { checkAuth } from "../../middlewares/checkAuth";
 
@@ -24,7 +24,7 @@ router.get("/:id", checkAuth(...Object.values(Role)), ParcelControllers.getSingl
 
 
 // Update parcel status
-router.patch("/:id/cancel", validateRequest(updateParcelStatusZodSchema), checkAuth(Role.SENDER), ParcelControllers.cancelParcel);
+router.patch("/:id/cancel",  checkAuth(Role.SENDER), ParcelControllers.cancelParcel);
 
 // Update parcel status by admin
 router.patch("/:id/status", checkAuth(Role.ADMIN), ParcelControllers.updateParcelStatus);

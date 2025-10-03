@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IParcel, ICreateParcelPayload, IUpdateParcelStatusPayload, IParcelStatus } from "./parcel.interface";
 import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status-codes";
@@ -6,7 +8,9 @@ import { Parcel } from "./parcel.model";
 import AppError from "../../errorHelper/appError";
 import { Role } from "../user/user.interface";
 import crypto from "crypto";
-import { User } from "../user/user.model";
+
+
+
 
 const prepareParcelResponse = (parcel: IParcel): IParcel => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,7 +38,11 @@ const createParcel = async (
 ): Promise<IParcel> => {
   const now = new Date();
 
-
+  // ❌ আর receiver lookup করে User collection থেকে id নেওয়ার দরকার নাই
+  // const receiverUser = await User.findOne({ email: payload.receiver });
+  // if (!receiverUser) {
+  //   throw new AppError(httpStatus.NOT_FOUND, "Receiver not found");
+  // }
 
   const newParcelData: IParcel = {
     trackingId: generateTrackingId(),
@@ -97,7 +105,8 @@ const getSingleParcel = async (parcelId: string, user: JwtPayload): Promise<IPar
 
 const cancelParcel = async (parcelId: string, senderId: string): Promise<IParcel> => {
   const parcel = await Parcel.findById(parcelId);
-
+  console.log("parcel in cancelParcel service", parcel);
+console.log("senderId in cancelParcel service", senderId);
     // Parcel ID validation
   if (!Types.ObjectId.isValid(parcelId)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid Parcel ID");
@@ -108,9 +117,7 @@ const cancelParcel = async (parcelId: string, senderId: string): Promise<IParcel
   }
 
  
-  if (parcel.sender.toString() !== senderId.toString()) { 
-    throw new AppError( httpStatus.FORBIDDEN ,"You are not authorized",   );
-  }
+
 
 
   //updated 
@@ -181,11 +188,20 @@ const updateParcelStatus = async (
   return prepareParcelResponse(updatedParcel as IParcel);
 };
 
+
+
 //getOwn 
-const getMyParcels = async (senderId: string): Promise<IParcel[]> => {
-  const parcels = await Parcel.find({ sender: new Types.ObjectId(senderId) }).populate("sender").populate("receiver.userId");
-  return parcels.map((parcel) => prepareParcelResponse(parcel as IParcel));
+const getMyParcels= async (userId: any) => {
+  // শুধু ওই user এর parcels ফেরত আনবে
+  const parcels = await Parcel.find({ user: userId }).sort({ createdAt: -1 });
+  return parcels;
 };
+
+
+
+
+
+
 
 //GetInComing
 const getIncomingParcels = async (receiverId: string): Promise<IParcel[]> => {
