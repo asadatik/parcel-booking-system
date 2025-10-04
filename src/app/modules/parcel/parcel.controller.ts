@@ -9,6 +9,7 @@ import { sendResponse } from "../../utils/sendResponse";
 import AppError from "../../errorHelper/appError";
 import { JwtPayload } from "jsonwebtoken";
 import { compile } from "ejs";
+import { ParcelRoutes } from "./parcel.routes";
 
 
 
@@ -156,7 +157,7 @@ const cancelParcel = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const decoded = req.user; // ✅ আসছে checkAuth থেকে
 
-  
+
    console.log("Decoded user from cancelParcel controller:", decoded);
   if (!decoded) {
     throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized request");
@@ -189,8 +190,11 @@ const getIncomingParcels = catchAsync(async (req: Request, res: Response) => {
   if (!decode) {
     throw new Error("Unauthorized: Invalid token");
   }
-  const receiverId = decode.userId;
-  const result = await ParcelServices.getIncomingParcels(receiverId);
+
+  const receiverEmail = decode.email;
+
+  console.log("Receiver Email from getIncomingParcels controller:", receiverEmail);
+  const result = await ParcelServices.getIncomingParcels(receiverEmail);
 
 
   sendResponse(res, {
@@ -201,6 +205,38 @@ const getIncomingParcels = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+
+// ✅ Confirm Parcel Delivery
+const confirmParcelDelivery = catchAsync(async (req: Request, res: Response) => {
+  const { parcelId } = req.params;
+  const result = await ParcelServices.confirmParcelDelivery(parcelId);
+
+  sendResponse(res, {
+    success: true,
+    message: "Parcel marked as delivered successfully!",
+    data: result,
+    statusCode:   httpStatus.OK,
+  });
+});
+
+
+//
+const getDeliveryHistory = catchAsync(async (req, res) => {
+  const { receiverId } = req.params;
+  console.log(receiverId , 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'   )
+  const result = await ParcelServices.getDeliveryHistory(receiverId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Delivery history fetched successfully",
+    data: result,
+  });
+});
+
+
+
 export const ParcelControllers = {
   createParcel,
   getAllParcel,
@@ -209,4 +245,6 @@ export const ParcelControllers = {
   updateParcelStatus,
   cancelParcel,
   getIncomingParcels,
+  confirmParcelDelivery,
+  getDeliveryHistory
 };

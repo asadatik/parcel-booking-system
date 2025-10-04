@@ -23,6 +23,9 @@ export const createUserZodSchema = z.object({
         .regex(/^(?=.*\d)/, {
             message: "Password must contain at least 1 number.",
         }),
+
+
+        
     phone: z
         .string({ error: "Phone Number must be string" })
         .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
@@ -61,7 +64,6 @@ export const updateUserZodSchema = z.object({
         })
         .optional(),
     role: z
-
         .enum(Object.values(Role) as [string])
         .optional(),
     isActive: z

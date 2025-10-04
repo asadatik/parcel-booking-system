@@ -203,11 +203,19 @@ const getMyParcels= async (userId: any) => {
 
 
 
-//GetInComing
-const getIncomingParcels = async (receiverId: string): Promise<IParcel[]> => {
-  const parcels = await Parcel.find({ "receiver.userId": new Types.ObjectId(receiverId) }).populate("sender").populate("receiver.userId");
+
+// Get Incoming Parcels for a receiver
+export const getIncomingParcels = async (receiverEmail: string): Promise<IParcel[]> => {
+  console.log("Receiver Email in getIncomingParcels service:", receiverEmail);
+
+  const parcels = await Parcel.find({ receiver: receiverEmail }) // email diye match
+    .populate("sender"); // sender info populate kora
+
   return parcels.map((parcel) => prepareParcelResponse(parcel as IParcel));
 };
+
+
+
 
 //removed
 const deleteParcel = async (parcelId: string): Promise<IParcel | null> => {
@@ -217,6 +225,37 @@ const deleteParcel = async (parcelId: string): Promise<IParcel | null> => {
  
   }
   return prepareParcelResponse(deletedParcel as IParcel);
+};
+
+
+// ✅ 2. Confirm parcel delivery (change status → Delivered)
+const confirmParcelDelivery = async (parcelId: string) => {
+  const updatedParcel = await Parcel.findByIdAndUpdate(
+    parcelId,
+    { currentStatus: IParcelStatus.Delivered },
+    { new: true }
+  );
+
+  if (!updatedParcel) {
+    throw new Error("Parcel not found or unable to confirm delivery.");
+  }
+
+  return updatedParcel;
+};
+
+//
+const getDeliveryHistory = async (receiverId: string): Promise<IParcel[]> => {
+  // শুধু সেই receiver এর delivered parcels ফেরত আনবে
+  const parcels = await Parcel.find({
+    receiver: receiverId,
+    currentStatus: "Delivered",
+  }).populate("sender");
+
+
+ console.log("Delivered parcels for receiver:", parcels);
+
+
+  return parcels.map((parcel) => prepareParcelResponse(parcel as IParcel));
 };
 
 
@@ -232,4 +271,7 @@ export const ParcelServices = {
   cancelParcel,
   updateParcelStatus,
   deleteParcel,
+  confirmParcelDelivery,
+  getDeliveryHistory
+
 };
