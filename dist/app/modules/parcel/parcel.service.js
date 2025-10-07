@@ -23,7 +23,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParcelServices = void 0;
+exports.ParcelServices = exports.getIncomingParcels = void 0;
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const parcel_interface_1 = require("./parcel.interface");
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const mongoose_1 = require("mongoose");
@@ -43,38 +45,38 @@ const generateTrackingId = () => {
     const randomBytes = crypto_1.default.randomBytes(3).toString("hex").toUpperCase(); // 6 chars
     return `TRK-${formattedDate}-${randomBytes}`;
 };
-//createdParcel 
+// create 
 const createParcel = (payload, senderId) => __awaiter(void 0, void 0, void 0, function* () {
-    // Ensure receiver.userId is a valid ObjectId if provided
-    let receiverUserId;
-    if (payload.receiver.userId && mongoose_1.Types.ObjectId.isValid(payload.receiver.userId)) {
-        receiverUserId = new mongoose_1.Types.ObjectId(payload.receiver.userId);
-    }
+    const now = new Date();
+    // ❌ আর receiver lookup করে User collection থেকে id নেওয়ার দরকার নাই
+    // const receiverUser = await User.findOne({ email: payload.receiver });
+    // if (!receiverUser) {
+    //   throw new AppError(httpStatus.NOT_FOUND, "Receiver not found");
+    // }
     const newParcelData = {
-        // Other data
+        trackingId: generateTrackingId(),
+        sender: new mongoose_1.Types.ObjectId(senderId),
+        // ✅ সরাসরি email string save করবো
+        receiver: payload.receiver,
         parcelType: payload.parcelType,
         weight: payload.weight,
         deliveryAddress: payload.deliveryAddress,
-        // basic data
-        trackingId: generateTrackingId(),
-        sender: new mongoose_1.Types.ObjectId(senderId),
-        receiver: {
-            name: payload.receiver.name,
-            phone: payload.receiver.phone,
-            address: payload.receiver.address,
-            userId: receiverUserId,
-        },
+        parcelFee: payload.parcelFee,
+        DeliveryDate: payload.DeliveryDate || now,
         currentStatus: parcel_interface_1.IParcelStatus.Requested,
         isCancelled: false,
         isDelivered: false,
+        isBlocked: false,
         statusLogs: [
             {
                 status: parcel_interface_1.IParcelStatus.Requested,
-                timestamp: new Date(),
+                timestamp: now,
                 updatedBy: new mongoose_1.Types.ObjectId(senderId),
                 note: "Parcel delivery request created by sender",
             },
         ],
+        createdAt: now,
+        updatedAt: now,
     };
     const newParcel = yield parcel_model_1.Parcel.create(newParcelData);
     return prepareParcelResponse(newParcel);
@@ -86,12 +88,11 @@ const getAllParcels = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 //getSingleParcel
 const getSingleParcel = (parcelId, user) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const parcel = yield parcel_model_1.Parcel.findById(parcelId);
     if (!parcel) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, "not found");
     }
-    if (user.role === user_interface_1.Role.ADMIN || parcel.sender.toString() === user.userId || ((_a = parcel.receiver.userId) === null || _a === void 0 ? void 0 : _a.toString()) === user.userId) {
+    if (user.role === user_interface_1.Role.ADMIN || parcel.sender.toString() === user.userId || parcel.receiver === user.email) {
         return prepareParcelResponse(parcel);
     }
     throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, 'not found');
@@ -99,15 +100,14 @@ const getSingleParcel = (parcelId, user) => __awaiter(void 0, void 0, void 0, fu
 //cancel
 const cancelParcel = (parcelId, senderId) => __awaiter(void 0, void 0, void 0, function* () {
     const parcel = yield parcel_model_1.Parcel.findById(parcelId);
+    console.log("parcel in cancelParcel service", parcel);
+    console.log("senderId in cancelParcel service", senderId);
     // Parcel ID validation
     if (!mongoose_1.Types.ObjectId.isValid(parcelId)) {
         throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Invalid Parcel ID");
     }
     if (!parcel) {
         throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, "Parcel not found");
-    }
-    if (parcel.sender.toString() !== senderId.toString()) {
-        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorized");
     }
     //updated 
     const updatedParcel = yield parcel_model_1.Parcel.findByIdAndUpdate(parcelId, {
@@ -157,15 +157,19 @@ const updateParcelStatus = (parcelId, payload, adminId) => __awaiter(void 0, voi
     return prepareParcelResponse(updatedParcel);
 });
 //getOwn 
-const getMyParcels = (senderId) => __awaiter(void 0, void 0, void 0, function* () {
-    const parcels = yield parcel_model_1.Parcel.find({ sender: new mongoose_1.Types.ObjectId(senderId) }).populate("sender").populate("receiver.userId");
+const getMyParcels = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    // শুধু ওই user এর parcels ফেরত আনবে
+    const parcels = yield parcel_model_1.Parcel.find({ user: userId }).sort({ createdAt: -1 });
+    return parcels;
+});
+// Get Incoming Parcels for a receiver
+const getIncomingParcels = (receiverEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Receiver Email in getIncomingParcels service:", receiverEmail);
+    const parcels = yield parcel_model_1.Parcel.find({ receiver: receiverEmail }) // email diye match
+        .populate("sender"); // sender info populate kora
     return parcels.map((parcel) => prepareParcelResponse(parcel));
 });
-//GetInComing
-const getIncomingParcels = (receiverId) => __awaiter(void 0, void 0, void 0, function* () {
-    const parcels = yield parcel_model_1.Parcel.find({ "receiver.userId": new mongoose_1.Types.ObjectId(receiverId) }).populate("sender").populate("receiver.userId");
-    return parcels.map((parcel) => prepareParcelResponse(parcel));
-});
+exports.getIncomingParcels = getIncomingParcels;
 //removed
 const deleteParcel = (parcelId) => __awaiter(void 0, void 0, void 0, function* () {
     const deletedParcel = yield parcel_model_1.Parcel.findByIdAndDelete(parcelId);
@@ -174,13 +178,33 @@ const deleteParcel = (parcelId) => __awaiter(void 0, void 0, void 0, function* (
     }
     return prepareParcelResponse(deletedParcel);
 });
+// ✅ 2. Confirm parcel delivery (change status → Delivered)
+const confirmParcelDelivery = (parcelId) => __awaiter(void 0, void 0, void 0, function* () {
+    const updatedParcel = yield parcel_model_1.Parcel.findByIdAndUpdate(parcelId, { currentStatus: parcel_interface_1.IParcelStatus.Delivered }, { new: true });
+    if (!updatedParcel) {
+        throw new Error("Parcel not found or unable to confirm delivery.");
+    }
+    return updatedParcel;
+});
+//
+const getDeliveryHistory = (receiverId) => __awaiter(void 0, void 0, void 0, function* () {
+    // শুধু সেই receiver এর delivered parcels ফেরত আনবে
+    const parcels = yield parcel_model_1.Parcel.find({
+        receiver: receiverId,
+        currentStatus: "Delivered",
+    }).populate("sender");
+    console.log("Delivered parcels for receiver:", parcels);
+    return parcels.map((parcel) => prepareParcelResponse(parcel));
+});
 exports.ParcelServices = {
     createParcel,
     getAllParcels,
     getMyParcels,
     getSingleParcel,
-    getIncomingParcels,
+    getIncomingParcels: exports.getIncomingParcels,
     cancelParcel,
     updateParcelStatus,
     deleteParcel,
+    confirmParcelDelivery,
+    getDeliveryHistory
 };

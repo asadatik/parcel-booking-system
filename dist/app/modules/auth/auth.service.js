@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthServices = void 0;
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 const appError_1 = __importDefault(require("../../errorHelper/appError"));
 const user_model_1 = require("../user/user.model");
@@ -43,9 +44,10 @@ const getNewAccessToken = (refreshToken) => __awaiter(void 0, void 0, void 0, fu
 // changePassword 
 const resetPassword = (oldPassword, newPassword, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findById(decodedToken.userId);
-    const isOldPasswordMatch = yield bcryptjs_1.default.compare(oldPassword, user.password);
+    console.log(oldPassword, newPassword, decodedToken);
+    const isOldPasswordMatch = yield bcryptjs_1.default.compare(oldPassword, user === null || user === void 0 ? void 0 : user.password);
     if (!isOldPasswordMatch) {
-        throw new appError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Old Password does not match");
+        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, 'Your old password not matched!');
     }
     user.password = yield bcryptjs_1.default.hash(newPassword, Number(env_1.envVars.BCRYPT_SALT_ROUND));
     user.save();

@@ -11,8 +11,9 @@ const env_1 = require("../config/env");
 const decodedToken = (token) => {
     try {
         const decoded = jsonwebtoken_1.default.verify(token, env_1.envVars.JWT_ACCESS_SECRET);
+        console.log("Decoded token in decodedToken function:", decoded);
         return {
-            userId: decoded.id,
+            userId: decoded.userId,
             role: decoded.role,
             email: decoded.email,
         };

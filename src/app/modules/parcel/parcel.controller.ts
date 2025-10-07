@@ -112,7 +112,7 @@ export const getMyParcels = async (req: Request, res  : Response) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch parcels",
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 };

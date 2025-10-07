@@ -16,6 +16,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 ;
 const app_1 = __importDefault(require("./app"));
 const env_1 = require("./app/config/env");
+const redis_config_1 = require("./app/config/redis.config");
 let server;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -29,7 +30,10 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(error);
     }
 });
-startServer();
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, redis_config_1.connectRedis)();
+    yield startServer();
+}))();
 process.on("SIGTERM", () => {
     console.log("SIGTERM signal recieved... Server shutting down..");
     if (server) {

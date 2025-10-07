@@ -22,16 +22,12 @@ exports.createUserZodSchema = zod_1.default.object({
         .regex(/^(?=.*[A-Z])/, {
         message: "Password must contain at least 1 uppercase letter.",
     })
-    // .regex(/^(?=.*[!@#$%^&*])/, {
-    //     message: "Password must contain at least 1 special character.",
-    // })
-    // .regex(/^(?=.*\d)/, {
-    //     message: "Password must contain at least 1 number.",
-    // }) 
-    ,
-    role: zod_1.default
-        .enum(Object.values(user_interface_1.Role))
-        .optional(),
+        .regex(/^(?=.*[!@#$%^&*])/, {
+        message: "Password must contain at least 1 special character.",
+    })
+        .regex(/^(?=.*\d)/, {
+        message: "Password must contain at least 1 number.",
+    }),
     phone: zod_1.default
         .string({ error: "Phone Number must be string" })
         .regex(/^(?:\+8801\d{9}|01\d{9})$/, {

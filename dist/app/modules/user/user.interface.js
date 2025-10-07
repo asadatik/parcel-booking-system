@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isActive = exports.Role = void 0;
 var Role;
 (function (Role) {
-    Role["SENDER"] = "SENDER";
     Role["ADMIN"] = "ADMIN";
+    Role["SENDER"] = "SENDER";
     Role["RECEIVER"] = "RECEIVER";
 })(Role || (exports.Role = Role = {}));
 var isActive;

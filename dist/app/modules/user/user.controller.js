@@ -1,5 +1,4 @@
 "use strict";
-/* eslint-disable @typescript-eslint/no-unused-vars */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -18,17 +17,51 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const user_service_1 = require("./user.service");
 const sendResponse_1 = require("../../utils/sendResponse");
 const catchAsync_1 = require("../../utils/catchAsync");
-// create user controller
-const createUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_service_1.UserServices.createUser(req.body);
+//create 
+const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield user_service_1.UserServices.createUser(req.body);
+        res.status(http_status_codes_1.default.CREATED).json({
+            message: "User Created Successfully",
+            user
+        });
+    }
+    catch (err) {
+        console.log("🚀 ~ file: user.controller.ts ~ line 15 ~ createUser ~ error", next(err));
+    }
+});
+// get all users
+const getAllUsers = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield user_service_1.UserServices.getAllUsers(req.query);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
-        statusCode: http_status_codes_1.default.CREATED,
-        message: "User Created Successfully",
-        data: user,
+        statusCode: http_status_codes_1.default.OK,
+        message: "Users fetched successfully",
+        data: users.data,
+        meta: users.meta
     });
 }));
-// update user controller
+// get All Sender
+const getAllSender = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield user_service_1.UserServices.getAllSender(req.query);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: 'Sender retrieved Successfully',
+        data,
+    });
+}));
+// get All  Receiver
+const getAllReceiver = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield user_service_1.UserServices.getAllReceiver(req.query);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: 'Receiver retrieved Successfully',
+        data,
+    });
+}));
+// update user
 const updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     const verifiedToken = req.user;
@@ -41,21 +74,11 @@ const updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
         data: user,
     });
 }));
-// get all users controller
-const getAllUsers = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserServices.getAllUsers();
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_codes_1.default.OK,
-        message: "All Users Retrieved Successfully",
-        data: result.data,
-        meta: result.meta
-    });
-}));
-// get me controller
+// get own profile
 const getMe = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const decodedToken = req.user;
     const result = yield user_service_1.UserServices.getMe(decodedToken.userId);
+    console.log("🚀 ~ file: user.controller.ts ~ line 94 ~ getMe ~ result", result);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
@@ -63,7 +86,7 @@ const getMe = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0,
         data: result.data
     });
 }));
-// get single user controller
+// getSingleUser 
 const getSingleUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const result = yield user_service_1.UserServices.getSingleUser(id);
@@ -77,7 +100,9 @@ const getSingleUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter
 exports.UserControllers = {
     createUser,
     getAllUsers,
+    getMe,
     getSingleUser,
     updateUser,
-    getMe
+    getAllReceiver,
+    getAllSender
 };

@@ -41,12 +41,7 @@ const parcelSchema = new mongoose_1.Schema({
         ref: "User",
         required: true,
     },
-    receiver: {
-        name: { type: String, required: true, trim: true },
-        phone: { type: String, required: true, trim: true },
-        address: { type: String, required: true, trim: true },
-        userId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
-    },
+    receiver: { type: String, ref: 'User', required: true },
     parcelType: {
         type: String,
         required: true,
@@ -68,9 +63,11 @@ const parcelSchema = new mongoose_1.Schema({
     },
     parcelFee: {
         type: Number,
+        required: true,
     },
-    estimatedDeliveryDate: {
+    DeliveryDate: {
         type: Date,
+        required: true,
     },
     isCancelled: {
         type: Boolean,

@@ -81,7 +81,8 @@ const logOutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     res.clearCookie("accessToken" ,  {  
         httpOnly: true,
         secure: false ,
-        sameSite: "lax" 
+        // sameSite: "lax" 
+        sameSite : "none"
        }  );
 
     // clear the refresh token cookie
@@ -89,7 +90,8 @@ const logOutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
         , {  
         httpOnly: true,
         secure: false ,
-        sameSite: "lax" 
+        // sameSite: "lax" 
+        sameSite : "none"
 
        }
     );
@@ -102,6 +104,12 @@ const logOutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 
 })
+
+
+
+
+
+
 
 // chang-password is a placeholder for future implementation
 

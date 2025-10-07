@@ -29,6 +29,8 @@ const user_model_1 = require("./user.model");
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const appError_1 = __importDefault(require("../../errorHelper/appError"));
+const QueryBuilder_1 = require("../../utils/QueryBuilder");
+const user_constant_1 = require("./user.constant");
 // create a new user
 const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = payload, rest = __rest(payload, ["email", "password"]);
@@ -46,19 +48,50 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     return user;
 });
 // get all users
-const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_model_1.User.find().select("-password");
-    const total = yield user_model_1.User.countDocuments();
+const getAllUsers = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const queryBuilder = new QueryBuilder_1.QueryBuilder(user_model_1.User.find(), query);
+    const users = yield queryBuilder
+        .search(user_constant_1.userSearchableFields)
+        .filter()
+        .sort()
+        .fields()
+        .paginate();
+    const [data, meta] = yield Promise.all([
+        users.build(),
+        queryBuilder.getMeta(),
+    ]);
     return {
-        data: users,
-        meta: {
-            total,
-            page: 1, // Assuming pagination is not implemented yet
-            limit: total // Assuming no limit is set
-        }
+        meta,
+        data,
     };
 });
-/////////  updated user ////
+//
+const getAllSender = (filters_1, ...args_1) => __awaiter(void 0, [filters_1, ...args_1], void 0, function* (filters, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    const senders = yield user_model_1.User.find(Object.assign({ role: user_interface_1.Role.SENDER }, filters))
+        .select("-password")
+        .skip(skip)
+        .limit(limit);
+    const total = yield user_model_1.User.countDocuments(Object.assign({ role: user_interface_1.Role.SENDER }, filters));
+    return {
+        data: senders,
+        meta: { total, page, limit }
+    };
+});
+//
+const getAllReceiver = (filters_1, ...args_1) => __awaiter(void 0, [filters_1, ...args_1], void 0, function* (filters, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    const receivers = yield user_model_1.User.find(Object.assign({ role: user_interface_1.Role.RECEIVER }, filters))
+        .select("-password")
+        .skip(skip)
+        .limit(limit);
+    const total = yield user_model_1.User.countDocuments(Object.assign({ role: user_interface_1.Role.RECEIVER }, filters));
+    return {
+        data: receivers,
+        meta: { total, page, limit }
+    };
+});
+// update user
 const updateUser = (userId, payload, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
     const ifUserExist = yield user_model_1.User.findById(userId);
     // Check if user exists
@@ -86,14 +119,14 @@ const updateUser = (userId, payload, decodedToken) => __awaiter(void 0, void 0, 
     const newUpdatedUser = yield user_model_1.User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true });
     return newUpdatedUser;
 });
-// get single user
+//
 const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findById(id).select("-password");
     return {
         data: user
     };
 });
-// get me
+//
 const getMe = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findById(userId).select("-password");
     return {
@@ -105,5 +138,7 @@ exports.UserServices = {
     getAllUsers,
     updateUser,
     getSingleUser,
-    getMe
+    getMe,
+    getAllReceiver,
+    getAllSender
 };

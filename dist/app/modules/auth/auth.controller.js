@@ -96,6 +96,8 @@ const changePassword = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
     const newPassword = req.body.newPassword;
     const oldPassword = req.body.oldPassword;
     const decodedToken = req.user;
+    console.log(decodedToken, 'controller');
+    console.log(oldPassword, newPassword);
     yield auth_service_1.AuthServices.resetPassword(oldPassword, newPassword, decodedToken);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
