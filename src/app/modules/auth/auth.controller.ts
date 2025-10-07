@@ -80,7 +80,7 @@ const logOutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     // clear the access token cookie 
     res.clearCookie("accessToken" ,  {  
         httpOnly: true,
-        secure: false ,
+        secure: true ,
         // sameSite: "lax" 
         sameSite : "none"
        }  );
@@ -89,7 +89,7 @@ const logOutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     res.clearCookie("refreshToken"
         , {  
         httpOnly: true,
-        secure: false ,
+        secure: true ,
         // sameSite: "lax" 
         sameSite : "none"
 
